@@ -1,0 +1,65 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+  employees Employee[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  orgId     String?
+  role      String
+  createdAt DateTime @default(now())
+  org       Organization? @relation(fields: [orgId], references: [id])
+}
+
+model Employee {
+  id        String   @id @default(uuid())
+  orgId     String
+  fullName  String
+  empNumber String
+  createdAt DateTime @default(now())
+  org       Organization @relation(fields: [orgId], references: [id])
+  dtrLogs   DTRLog[]
+}
+
+model QRSession {
+  id        String   @id @default(uuid())
+  orgId     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  org       Organization @relation(fields: [orgId], references: [id])
+}
+
+model DTRLog {
+  id           String   @id @default(uuid())
+  employeeId   String
+  qrSessionId  String?
+  logTimestamp DateTime @default(now())
+  type         String
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  qrSession    QRSession? @relation(fields: [qrSessionId], references: [id])
+}
+
+model SessionToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
