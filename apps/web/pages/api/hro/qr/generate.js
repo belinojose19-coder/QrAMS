@@ -1,6 +1,6 @@
-const prisma = require('../../../lib/prisma')
-const { getUserFromRequest } = require('../../../lib/auth')
-const { encrypt, createHmacSignature } = require('../../../lib/qr')
+const prisma = require('../../../../lib/prisma')
+const { getUserFromRequest } = require('../../../../lib/auth')
+const { encrypt, createHmacSignature } = require('../../../../lib/qr')
 const crypto = require('crypto')
 
 export default async function handler(req, res) {

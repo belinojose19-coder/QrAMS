@@ -105,7 +105,7 @@ export default function EmployeeScan() {
 
 export async function getServerSideProps(context) {
   const { req } = context
-  const { getUserFromRequest } = require('../../lib/auth')
+  const { getUserFromRequest } = require('../lib/auth')
   const user = await getUserFromRequest(req)
   if (!user) {
     return { redirect: { destination: '/admin/login', permanent: false } }
