@@ -1,6 +1,6 @@
-const prisma = require('../../../../lib/prisma')
-const { getUserFromRequest } = require('../../../../lib/auth')
-const { decrypt, verifyHmacSignature } = require('../../../../lib/qr')
+const prisma = require('../lib/prisma')
+const { getUserFromRequest } = require('../lib/auth')
+const { decrypt, verifyHmacSignature } = require('../lib/qr')
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })

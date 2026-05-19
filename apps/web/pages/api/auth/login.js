@@ -1,7 +1,7 @@
-const prisma = require('../../../../lib/prisma')
-const { verifyPassword, createSession, setSessionCookie } = require('../../../../lib/auth')
-const { rateLimit } = require('../../../../lib/rateLimiter')
-const { isEmail } = require('../../../../lib/validate')
+const prisma = require('../../../lib/prisma')
+const { verifyPassword, createSession, setSessionCookie } = require('../../../lib/auth')
+const { rateLimit } = require('../../../lib/rateLimiter')
+const { isEmail } = require('../../../lib/validate')
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
