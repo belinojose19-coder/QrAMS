@@ -1,68 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  users     User[]
-  employees Employee[]
+  id         String      @id @default(dbgenerated("gen_random_uuid()"))
+  name       String
+  code       String      @unique
+  createdAt  DateTime?   @default(now()) @db.Timestamptz(6)
+  employees  Employee[]
   qrSessions QRSession[]
+  users      User[]
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  orgId     String?
-  role      String
-  createdAt DateTime @default(now())
-  org       Organization? @relation(fields: [orgId], references: [id])
+  id            String         @id @default(dbgenerated("gen_random_uuid()"))
+  email         String         @unique
+  password      String
+  orgId         String?
+  role          String
+  createdAt     DateTime?      @default(now()) @db.Timestamptz(6)
   sessionTokens SessionToken[]
+  org           Organization?  @relation(fields: [orgId], references: [id], onUpdate: NoAction)
 }
 
 model Employee {
-  id        String   @id @default(uuid())
+  id        String       @id @default(dbgenerated("gen_random_uuid()"))
   orgId     String
   fullName  String
   empNumber String
-  createdAt DateTime @default(now())
-  org       Organization @relation(fields: [orgId], references: [id])
+  createdAt DateTime?    @default(now()) @db.Timestamptz(6)
   dtrLogs   DTRLog[]
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model QRSession {
-  id        String   @id @default(uuid())
-  orgId     String
-  tokenHash String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  org       Organization @relation(fields: [orgId], references: [id])
-  dtrLogs   DTRLog[]
+  id             String       @id @default(dbgenerated("gen_random_uuid()"))
+  orgId          String
+  tokenHash      String       @unique
+  tokenSignature String?
+  sessionDate    DateTime     @db.Date
+  scanType       String
+  expiresAt      DateTime     @db.Timestamptz(6)
+  createdAt      DateTime?    @default(now()) @db.Timestamptz(6)
+  dtrLogs        DTRLog[]
+  org            Organization @relation(fields: [orgId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model DTRLog {
-  id           String   @id @default(uuid())
+  id           String     @id @default(dbgenerated("gen_random_uuid()"))
   employeeId   String
   qrSessionId  String?
-  logTimestamp DateTime @default(now())
+  logTimestamp DateTime?  @default(now()) @db.Timestamptz(6)
   type         String
-  employee     Employee @relation(fields: [employeeId], references: [id])
-  qrSession    QRSession? @relation(fields: [qrSessionId], references: [id])
+  employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  qrSession    QRSession? @relation(fields: [qrSessionId], references: [id], onUpdate: NoAction)
 }
 
 model SessionToken {
-  id        String   @id @default(uuid())
+  id        String    @id @default(dbgenerated("gen_random_uuid()"))
   userId    String
-  tokenHash String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz(6)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
