@@ -1,6 +1,6 @@
-const prisma = require('../lib/prisma')
-const { getUserFromRequest } = require('../lib/auth')
-const { decrypt, verifyHmacSignature } = require('../lib/qr')
+const prisma = require('../../lib/prisma')
+const { getUserFromRequest } = require('../../lib/auth')
+const { decrypt, verifyHmacSignature } = require('../../lib/qr')
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -33,8 +33,9 @@ export default async function handler(req, res) {
     const payload = JSON.parse(decryptedString)
     const { sessionId, orgId, scanType, expiresAt } = payload
 
-    // 3. Validate Expiry
-    if (Date.now() > expiresAt) {
+    // 3. Validate Expiry (accept number or ISO string)
+    const expMs = typeof expiresAt === 'number' ? expiresAt : new Date(expiresAt).getTime()
+    if (isNaN(expMs) || Date.now() > expMs) {
       return res.status(403).json({ error: 'This QR session has expired' })
     }
 
@@ -72,9 +73,10 @@ export default async function handler(req, res) {
     })
 
     if (lastLog) {
-      const diffMinutes = Math.ceil((Date.now() - lastLog.logTimestamp.getTime()) / (1000 * 60))
-      return res.status(429).json({ 
-        error: `Cooldown active. Please wait ${30 - diffMinutes} more minutes before scanning ${scanType} again.` 
+      const lastTs = new Date(lastLog.logTimestamp).getTime()
+      const diffMinutes = Math.ceil((Date.now() - lastTs) / (1000 * 60))
+      return res.status(429).json({
+        error: `Cooldown active. Please wait ${Math.max(0, 30 - diffMinutes)} more minutes before scanning ${scanType} again.`
       })
     }
 

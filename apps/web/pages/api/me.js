@@ -1,4 +1,4 @@
-const { getUserFromRequest } = require('../lib/auth')
+const { getUserFromRequest } = require('../../lib/auth')
 
 export default async function handler(req, res) {
   try {

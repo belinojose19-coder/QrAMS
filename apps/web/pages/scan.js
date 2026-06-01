@@ -97,7 +97,19 @@ export default function EmployeeScan() {
       </div>
 
       <div style={{ marginTop: 32, textAlign: 'center' }}>
-        <a href="/api/auth/logout" style={{ color: '#666', fontSize: '14px' }}>Log out of account</a>
+        <button
+          onClick={async () => {
+            try {
+              await fetch('/api/auth/logout', { method: 'POST' })
+              window.location.href = '/admin/login'
+            } catch (e) {
+              setStatus({ type: 'error', message: 'Logout failed' })
+            }
+          }}
+          style={{ background: 'none', border: 'none', color: '#666', fontSize: 14, cursor: 'pointer' }}
+        >
+          Log out of account
+        </button>
       </div>
     </main>
   )

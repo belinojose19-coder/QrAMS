@@ -14,6 +14,7 @@ model Organization {
   createdAt DateTime @default(now())
   users     User[]
   employees Employee[]
+  qrSessions QRSession[]
 }
 
 model User {
@@ -24,6 +25,7 @@ model User {
   role      String
   createdAt DateTime @default(now())
   org       Organization? @relation(fields: [orgId], references: [id])
+  sessionTokens SessionToken[]
 }
 
 model Employee {
@@ -43,6 +45,7 @@ model QRSession {
   expiresAt DateTime
   createdAt DateTime @default(now())
   org       Organization @relation(fields: [orgId], references: [id])
+  dtrLogs   DTRLog[]
 }
 
 model DTRLog {
